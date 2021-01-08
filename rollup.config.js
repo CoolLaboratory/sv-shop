@@ -2,6 +2,7 @@ import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
+import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 
 const production = !process.env.ROLLUP_WATCH;
@@ -39,11 +40,12 @@ export default {
 		svelte({
 			// enable run-time checks when not in production
 			dev: !production,
+
+			emitCss: true
+
 			// we'll extract any component CSS out into
 			// a separate file - better for performance
-			css: css => {
-				css.write('bundle.css');
-			}
+			// css: css => { css.write('bundle.css'); }
 		}),
 
 		// If you have external dependencies installed from
@@ -56,6 +58,13 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+    postcss({
+      extract: true,
+		  minimize: true,
+			use: {
+				sass: { includePaths: [ './theme', './node_modules' ] }
+			}
+    }),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
